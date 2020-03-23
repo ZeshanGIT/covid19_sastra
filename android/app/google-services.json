@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "655625131699",
+    "firebase_url": "https://covid-19-by-sastra.firebaseio.com",
+    "project_id": "covid-19-by-sastra",
+    "storage_bucket": "covid-19-by-sastra.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655625131699:android:ef73733f2e8163547502c6",
+        "android_client_info": {
+          "package_name": "edu.sastra.covid19"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "655625131699-5nvpt0pef2s2e7q346jisnmeelntosuq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYuJvuqAdfPeq6PlENig2nJ4sPKciFkcs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "655625131699-5nvpt0pef2s2e7q346jisnmeelntosuq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
