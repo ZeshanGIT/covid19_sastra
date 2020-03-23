@@ -44,6 +44,82 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('COVID 19'),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.info),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => Scaffold(
+                      appBar: AppBar(
+                        title: Text('About'),
+                      ),
+                      body: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.2,
+                              child: Row(
+                                children: <Widget>[
+                                  Flexible(
+                                    flex: 1,
+                                    child: Image.asset('assets/goi.jpg'),
+                                  ),
+                                  Flexible(
+                                    flex: 2,
+                                    child: Image.asset('assets/logo.png'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Text(
+                              'Developed By',
+                              style: TextStyle(
+                                color: Colors.black54,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Text(
+                              'K S Seshan',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 32),
+                            Text(
+                              'Under the guidance of',
+                              style: TextStyle(
+                                color: Colors.black54,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Text(
+                              'Dr. V S Shankar Sriram',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Text(
+                              'Prof. K S Suresh',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              })
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
