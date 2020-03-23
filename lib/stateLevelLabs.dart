@@ -1,27 +1,34 @@
-import 'package:after_layout/after_layout.dart';
-import 'package:android_intent/android_intent.dart';
 import 'package:covid19_sastra/shared.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 
-class LabsNearMe extends StatefulWidget {
+class StateLevelLabs extends StatefulWidget {
+  final String state;
+
+  const StateLevelLabs(this.state, {Key key}) : super(key: key);
   @override
-  _LabsNearMeState createState() => _LabsNearMeState();
+  _StateLevelLabsState createState() => _StateLevelLabsState();
 }
 
-class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
-  String state = '';
-  List<String> govtLabs = [];
-  List<String> pvtLabs = [];
+class _StateLevelLabsState extends State<StateLevelLabs> {
+  String state;
 
   bool expanded = false;
+  List<String> govtLabs;
+  List<String> pvtLabs;
+  @override
+  void initState() {
+    state = widget.state;
+    govtLabs = govt[state];
+    pvtLabs = pvt[state];
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Testing Labs in $state'),
+        title: Text('Labs in $state'),
       ),
       body: govtLabs.isEmpty
           ? Center(child: CircularProgressIndicator())
@@ -32,17 +39,6 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'Nearest labs appear first',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
                       ExpansionTile(
                         onExpansionChanged: (state) {
                           setState(() {
@@ -161,84 +157,5 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
               ],
             ),
     );
-  }
-
-  void openLocationSetting() async {
-    if ((await Geolocator().checkGeolocationPermissionStatus()) !=
-        GeolocationStatus.granted) {
-      final AndroidIntent intent = new AndroidIntent(
-        action: 'android.settings.LOCATION_SOURCE_SETTINGS',
-      );
-      await intent.launch();
-    }
-  }
-
-  @override
-  Future<void> afterFirstLayout(BuildContext context) async {
-    openLocationSetting();
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    List<Placemark> placemark = await Geolocator()
-        .placemarkFromCoordinates(position.latitude, position.longitude);
-
-    state = placemark[0].administrativeArea;
-    initializeGovt(position);
-    initializePvt(position);
-  }
-
-  initializeGovt(Position position) {
-    govtLabs = govt[state];
-    Map<String, int> distances = {};
-
-    govtLabs.forEach((f) async {
-      List<Placemark> placemarkA =
-          await Geolocator().placemarkFromAddress(f + ', ' + state);
-      Placemark kA = placemarkA[0];
-      double distance = await Geolocator().distanceBetween(
-        position.latitude,
-        position.longitude,
-        kA.position.latitude,
-        kA.position.longitude,
-      );
-      distances[f] = distance.toInt();
-      if (govtLabs.last == f) {
-        List<String> labsTemp = List<String>.from(govtLabs);
-        labsTemp.sort((a, b) {
-          return distances[a] - distances[b];
-        });
-        setState(() {
-          state = state;
-          govtLabs = labsTemp;
-        });
-      }
-    });
-  }
-
-  initializePvt(Position position) {
-    pvtLabs = pvt[state];
-    Map<String, int> distances = {};
-
-    (pvtLabs ?? []).forEach((f) async {
-      List<Placemark> placemarkA =
-          await Geolocator().placemarkFromAddress(f + ', ' + state);
-      Placemark kA = placemarkA[0];
-      double distance = await Geolocator().distanceBetween(
-        position.latitude,
-        position.longitude,
-        kA.position.latitude,
-        kA.position.longitude,
-      );
-      distances[f] = distance.toInt();
-      if (pvtLabs.last == f) {
-        List<String> labsTemp = List<String>.from(pvtLabs);
-        labsTemp.sort((a, b) {
-          return distances[a] - distances[b];
-        });
-        setState(() {
-          state = state;
-          pvtLabs = labsTemp;
-        });
-      }
-    });
   }
 }

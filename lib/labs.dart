@@ -6,9 +6,8 @@ import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PDFScreen extends StatelessWidget {
-  String pdf;
-  bool isGovt;
-  PDFScreen(this.pdf, this.isGovt);
+  String title, filename;
+  PDFScreen(this.title, this.filename);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class PDFScreen extends StatelessWidget {
         if (ss.data != null)
           return PDFViewerScaffold(
             appBar: AppBar(
-              title: Text(isGovt ? 'Government Labs' : 'Private Labs'),
+              title: Text(title),
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.share),
@@ -41,13 +40,12 @@ class PDFScreen extends StatelessWidget {
   }
 
   Future<String> prepareTestPdf(BuildContext context) async {
-    final ByteData bytes = await DefaultAssetBundle.of(context)
-        .load(isGovt ? 'assets/govt.pdf' : 'assets/private.pdf');
+    final ByteData bytes =
+        await DefaultAssetBundle.of(context).load('assets/$filename');
     final Uint8List list = bytes.buffer.asUint8List();
 
     final tempDir = await getTemporaryDirectory();
-    final tempDocumentPath =
-        '${tempDir.path}/${isGovt ? 'assets/govt.pdf' : 'private.pdf'}';
+    final tempDocumentPath = '${tempDir.path}/assets/$filename';
 
     final file = await File(tempDocumentPath).create(recursive: true);
     file.writeAsBytesSync(list);
