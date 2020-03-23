@@ -18,27 +18,107 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Places in $state'),
-      ),
-      body: ListView.builder(
-        itemCount: labs.length,
-        itemBuilder: (_, i) {
-          return RaisedButton(
-            onPressed: () {
-              MapsLauncher.launchQuery(
-                  'https://www.google.com/maps/search/${labs[i].replaceAll(' ', '+')}+$state');
-            },
-            child: Text(
-              labs[i],
-              style: TextStyle(
-                fontSize: 24,
-              ),
-            ),
-          );
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text('Testing Labs in $state'),
+        ),
+        body: labs.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Nearest labs appear first',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  ExpansionTile(
+                    title: Text('Government Labs'),
+                    children: List.generate(labs.length, (i) {
+                      return Column(
+                        children: <Widget>[
+                          Divider(color: Colors.black38),
+                          RaisedButton(
+                            elevation: 2,
+                            color: Colors.white,
+                            onPressed: () {
+                              MapsLauncher.launchQuery(
+                                  'https://www.google.com/maps/search/${labs[i].replaceAll(' ', '+')}+$state');
+                            },
+                            child: Container(
+                              width: double.maxFinite,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 16,
+                              ),
+                              child: Text(
+                                labs[i],
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ),
+                ],
+              )
+        // : ListView.builder(
+        //     itemCount: labs.length + 1,
+        //     itemBuilder: (_, i) {
+        //       if (i == 0) {
+        //         return Padding(
+        //           padding: const EdgeInsets.all(16.0),
+        //           child: Text(
+        //             'Nearest labs appear first',
+        //             style: TextStyle(
+        //               color: Colors.red,
+        //               fontWeight: FontWeight.bold,
+        //               fontSize: 18,
+        //             ),
+        //           ),
+        //         );
+        //       } else {
+        //         --i;
+        //       }
+        //       return Column(
+        //         children: <Widget>[
+        //           Divider(color: Colors.black38),
+        //           RaisedButton(
+        //             elevation: 2,
+        //             color: Colors.white,
+        //             onPressed: () {
+        //               MapsLauncher.launchQuery(
+        //                   'https://www.google.com/maps/search/${labs[i].replaceAll(' ', '+')}+$state');
+        //             },
+        //             child: Container(
+        //               width: double.maxFinite,
+        //               padding: EdgeInsets.symmetric(
+        //                 horizontal: 8,
+        //                 vertical: 16,
+        //               ),
+        //               child: Text(
+        //                 labs[i],
+        //                 textAlign: TextAlign.center,
+        //                 style: TextStyle(
+        //                   fontSize: 18,
+        //                 ),
+        //               ),
+        //             ),
+        //           ),
+        //         ],
+        //       );
+        //     },
+        //   ),
+        );
   }
 
   void openLocationSetting() async {
@@ -63,7 +143,7 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
     // });
 
     state = placemark[0].administrativeArea;
-    labs = data[state];
+    labs = govt[state];
     Map<String, int> distances = {};
 
     labs.forEach((f) async {

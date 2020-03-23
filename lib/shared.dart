@@ -1,4 +1,6 @@
-const data = {
+import 'package:flutter/material.dart';
+
+const govt = {
   "Andhra Pradesh": [
     "Sri Venkateswara Institute of Medical Sciences, Tirupati",
     "Rangaraya Medical College, Kakinada",
@@ -136,3 +138,31 @@ const data = {
   ],
   "Andaman & Nicobar Islands": ["Regional Medical Research Centre, Port Blair"]
 };
+
+const pvt = {
+  "Gujarat": [" Unipath Specialty laboratory limited, Ahmedabad"],
+  "Karnataka": [" Neuberg Anand Reference Laboratory, Bengaluru"],
+  "Maharashtra": [
+    " Thyrocare Mumbai",
+    "Suburban Diagnostics Mumbai",
+    "Metropolis Healthcare Ltd Mumbai",
+    " Sir H.N. Reliance, Foundation Hospital and Research Centre, Mumbai",
+  ]
+};
+
+var dec = BoxDecoration(
+  image: DecorationImage(
+    image: AssetImage('assets/bg.jpg'),
+    fit: BoxFit.cover,
+    colorFilter: ColorFilter.mode(
+      Colors.black45,
+      BlendMode.luminosity,
+    ),
+  ),
+);
+
+var textStyle = TextStyle(
+  color: Colors.white,
+  fontWeight: FontWeight.bold,
+  fontSize: 24,
+);

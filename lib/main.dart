@@ -3,6 +3,7 @@ import 'package:covid19_sastra/labsNearMe.dart';
 import 'package:covid19_sastra/tracker.dart';
 import 'package:flutter/material.dart';
 
+import 'shared.dart';
 import 'updates/updates.dart';
 
 void main() => runApp(MyApp());
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   BuildContext _context;
 
+  double fontSize;
+
   @override
   Widget build(BuildContext context) {
     _context = context;
@@ -43,7 +46,8 @@ class HomePage extends StatelessWidget {
           Text(
             'लोकाः समस्ताः सुखिनोभवंतु',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Image.asset(
@@ -53,13 +57,16 @@ class HomePage extends StatelessWidget {
           RaisedButton(
             color: Colors.white,
             onPressed: _openUpdates,
-            padding: const EdgeInsets.all(32),
             child: Container(
+              decoration: dec,
+              padding: const EdgeInsets.all(32),
               alignment: Alignment.center,
               width: double.maxFinite,
               child: Text(
                 'Govt. of India Updates',
                 style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
               ),
@@ -67,65 +74,62 @@ class HomePage extends StatelessWidget {
           ),
           SizedBox(height: 16),
           RaisedButton(
-            color: Colors.white,
             onPressed: () => Navigator.of(context).pushNamed('/tracker'),
-            padding: const EdgeInsets.all(32),
             child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: dec,
               alignment: Alignment.center,
               width: double.maxFinite,
-              child: Text(
-                'COVID 19 Global Tracker',
-                style: TextStyle(
-                  fontSize: 24,
-                ),
-              ),
+              child: Text('COVID 19 Global Tracker', style: textStyle),
             ),
           ),
           SizedBox(height: 16),
           RaisedButton(
             color: Colors.white,
             onPressed: () => Navigator.of(context).pushNamed('/labsNearMe'),
-            padding: const EdgeInsets.all(32),
             child: Container(
+              decoration: dec,
+              padding: const EdgeInsets.all(32),
               alignment: Alignment.center,
               width: double.maxFinite,
               child: Text(
                 'Testing Labs near me',
-                style: TextStyle(
-                  fontSize: 24,
-                ),
+                style: textStyle,
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              RaisedButton(
-                color: Colors.white,
-                onPressed: () => Navigator.of(context).pushNamed('/govtLabs'),
-                padding: const EdgeInsets.all(32),
-                child: Text(
-                  'Govt.',
-                  style: TextStyle(
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-              RaisedButton(
-                color: Colors.white,
-                onPressed: () => Navigator.of(context).pushNamed('/pvtLabs'),
-                padding: const EdgeInsets.all(32),
-                child: Text(
-                  'Private',
-                  style: TextStyle(
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-            ],
-          )
         ],
       ),
+    );
+  }
+
+  Row buildRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        RaisedButton(
+          color: Colors.white,
+          onPressed: () => Navigator.of(context).pushNamed('/govtLabs'),
+          padding: const EdgeInsets.all(32),
+          child: Text(
+            'Govt.',
+            style: TextStyle(
+              fontSize: 24,
+            ),
+          ),
+        ),
+        RaisedButton(
+          color: Colors.white,
+          onPressed: () => Navigator.of(context).pushNamed('/pvtLabs'),
+          padding: const EdgeInsets.all(32),
+          child: Text(
+            'Private',
+            style: TextStyle(
+              fontSize: 24,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
