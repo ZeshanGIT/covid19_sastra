@@ -64,7 +64,7 @@ class _StateLevelLabsState extends State<StateLevelLabs> {
                                 color: Colors.white,
                                 onPressed: () {
                                   MapsLauncher.launchQuery(
-                                      'https://www.google.com/maps/search/${govtLabs[i].replaceAll(' ', '+')}+$state');
+                                      '${govtLabs[i]}, $state');
                                 },
                                 child: Container(
                                   width: double.maxFinite,
@@ -123,7 +123,7 @@ class _StateLevelLabsState extends State<StateLevelLabs> {
                                       color: Colors.white,
                                       onPressed: () {
                                         MapsLauncher.launchQuery(
-                                            'https://www.google.com/maps/search/${govtLabs[i].replaceAll(' ', '+')}+$state');
+                                            '${pvtLabs[i]}, $state');
                                       },
                                       child: Container(
                                         width: double.maxFinite,

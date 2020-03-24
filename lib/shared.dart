@@ -49,7 +49,7 @@ const govt = {
   "Jammu & Kashmir": [
     "Govt. Medical College, Jammu",
     "Command Hospital  Udhampur",
-    "Sher-i-Kashmir Institute of Medical Sciences, Srinagar",
+    "SheriKashmir Institute of Medical Sciences, Srinagar",
     "Govt. Medical College, Srinagar"
   ],
   "Jharkhand": ["MGM Medical College & Hospital, Jamshedpur"],
@@ -86,7 +86,7 @@ const govt = {
     "Govt. Medical College, Bhopal"
   ],
   "Manipur": [
-    "Jawaharlal Nehru Institute of Med. Sciences, Imphal-East, Manipur",
+    "Jawaharlal Nehru Institute of Med. Sciences, ImphalEast, Manipur",
     "Regional Institute of Medical Sciences, Imphal"
   ],
   "Meghalaya": [
@@ -166,3 +166,42 @@ var textStyle = TextStyle(
   fontWeight: FontWeight.bold,
   fontSize: 24,
 );
+
+const helpLine = {
+  "Andhra Pradesh": ["08662410978"],
+  "Arunachal Pradesh": ["9436055743"],
+  "Assam": ["6913347770"],
+  "Bihar": ["104"],
+  "Chhattisgarh": ["104"],
+  "Goa": ["104"],
+  "Gujarat": ["104"],
+  "Haryana": ["8558893911"],
+  "Himachal Pradesh": ["104"],
+  "Jharkhand": ["104"],
+  "Karnataka": ["104"],
+  "Kerala": ["04712552056"],
+  "Madhya Pradesh": ["104"],
+  "Maharashtra": ["02026127394"],
+  "Manipur": ["3852411668"],
+  "Meghalaya": ["108"],
+  "Mizoram": ["102"],
+  "Nagaland": ["7005539653"],
+  "Odisha": ["9439994859"],
+  "Punjab": ["104"],
+  "Rajasthan": ["01412225624"],
+  "Sikkim": ["104"],
+  "Tamil Nadu": ["04429510500"],
+  "Telangana": ["104"],
+  "Tripura": ["03812315879"],
+  "Uttarakhand": ["104"],
+  "Uttar Pradesh": ["18001805145"],
+  "West Bengal": ["1800313444222", "03323412600"],
+  "Andaman and Nicobar": ["03192232102"],
+  "Chandigarh": ["9779558282"],
+  "Dadra and Nagar Haveli and Daman & Diu": ["104"],
+  "Delhi": ["01122307145"],
+  "Jammu & Kashmir": ["01912520982", "01942440283"],
+  "Ladakh": ["01982256462"],
+  "Lakshadweep": ["104"],
+  "Puducherry": ["104"]
+};

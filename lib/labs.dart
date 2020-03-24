@@ -2,12 +2,15 @@ import 'dart:io';
 import 'dart:async' show Future;
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:esys_flutter_share/esys_flutter_share.dart' as EsysFlutterShare;
 
 class PDFScreen extends StatelessWidget {
   String title, filename;
   PDFScreen(this.title, this.filename);
+  List<int> bytes;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +30,14 @@ class PDFScreen extends StatelessWidget {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.share),
-                  onPressed: () {},
+                  onPressed: () async {
+                    EsysFlutterShare.Share.file(
+                      'COVID 19 - Awarness',
+                      "Do's and Don'ts - COVID 19",
+                      bytes,
+                      'application/pdf',
+                    );
+                  },
                 ),
               ],
             ),
@@ -40,10 +50,10 @@ class PDFScreen extends StatelessWidget {
   }
 
   Future<String> prepareTestPdf(BuildContext context) async {
-    final ByteData bytes =
+    final ByteData _bytes =
         await DefaultAssetBundle.of(context).load('assets/$filename');
-    final Uint8List list = bytes.buffer.asUint8List();
-
+    final Uint8List list = _bytes.buffer.asUint8List();
+    bytes = list;
     final tempDir = await getTemporaryDirectory();
     final tempDocumentPath = '${tempDir.path}/assets/$filename';
 

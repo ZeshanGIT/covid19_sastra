@@ -1,9 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:covid19_sastra/shared.dart';
-import 'package:covid19_sastra/updates/widgets/myPost.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'widgets/postModel.dart';
 
 class Updates extends StatelessWidget {
   String js = '''
@@ -58,14 +54,5 @@ removeElementsByClass('menu');
       //   },
       // ),
     );
-  }
-
-  List<dynamic> fromQuerySS(QuerySnapshot event) {
-    var list = [];
-    event.documents.forEach((f) {
-      // print(f.data);
-      list.add(PostModel(f.documentID, f.data));
-    });
-    return list;
   }
 }

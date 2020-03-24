@@ -1,13 +1,68 @@
+import 'package:after_layout/after_layout.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:android_intent/android_intent.dart';
 import 'package:covid19_sastra/labs.dart';
 import 'package:covid19_sastra/labsNearMe.dart';
+import 'package:covid19_sastra/listAllhelpLines.dart';
 import 'package:covid19_sastra/tracker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:esys_flutter_share/esys_flutter_share.dart' as EsysFlutterShare;
 import 'allLabs.dart';
 import 'shared.dart';
 import 'updates/updates.dart';
 
-void main() => runApp(MyApp());
+Future<void> main() async {
+  runApp(MyApp());
+  final int helloAlarmID = 0;
+  await AndroidAlarmManager.initialize();
+  print(await AndroidAlarmManager.periodic(
+    const Duration(hours: 2),
+    helloAlarmID,
+    showNoti,
+  ));
+}
+
+Future<void> showNoti() async {
+  if (!(DateTime.now().hour < 6 || DateTime.now().hour > 21)) {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('noti_icon');
+    var initializationSettingsIOS = IOSInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+      onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+    );
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      '1',
+      'washYourHands',
+      'for20seconds',
+    );
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    NotificationDetails platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    // await flutterLocalNotificationsPlugin.show(
+    //     0, 'asdf', 'fdsa', platformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      1,
+      'Wash for hands',
+      'for 20 seconds',
+      platformChannelSpecifics,
+    );
+  }
+  // print('############################');
+}
+
+Future onSelectNotification(String payload) async {}
 
 class MyApp extends StatelessWidget {
   @override
@@ -27,16 +82,44 @@ class MyApp extends StatelessWidget {
         '/labsNearMe': (_) => LabsNearMe(),
         '/dnd': (_) => PDFScreen("Do's and Dont's", 'dnd.pdf'),
         '/allLabs': (_) => AllLabs(),
+        '/listAllHelplines': (_) => ListAllHelplines(),
       },
       home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  BuildContext _context;
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> with AfterLayoutMixin {
+  BuildContext _context;
   double fontSize;
+  String state = '';
+
+  void openLocationSetting() async {
+    if ((await Geolocator().checkGeolocationPermissionStatus()) !=
+        GeolocationStatus.granted) {
+      final AndroidIntent intent = new AndroidIntent(
+        action: 'android.settings.LOCATION_SOURCE_SETTINGS',
+      );
+      await intent.launch();
+    }
+  }
+
+  @override
+  Future<void> afterFirstLayout(BuildContext context) async {
+    openLocationSetting();
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemark = await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+    setState(() {
+      state = placemark[0].administrativeArea;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +128,15 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('COVID 19'),
         actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () {
+                EsysFlutterShare.Share.text(
+                  'COVID 19 - Awarness',
+                  'Share the app and save the country.\n*Prevention is better than cure*\n\nhttps://play.google.com/store/apps/details?id=edu.sastra.covid19_sastra',
+                  'text/*',
+                );
+              }),
           IconButton(
               icon: Icon(Icons.info),
               onPressed: () {
@@ -138,6 +230,40 @@ class HomePage extends StatelessWidget {
               'assets/logo.png',
               width: double.maxFinite,
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                RaisedButton(
+                  padding: EdgeInsets.all(12.0),
+                  color: Colors.white,
+                  onPressed: () {
+                    _launchURL('tel:${helpLine[state]}');
+                  },
+                  shape: StadiumBorder(),
+                  child: Text(
+                    'Call $state helpline',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+                RaisedButton(
+                  padding: EdgeInsets.all(12.0),
+                  color: Colors.white,
+                  shape: StadiumBorder(),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/listAllHelplines');
+                  },
+                  child: Text(
+                    'All helplines',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: 16),
             RaisedButton(
               color: Colors.white,
               onPressed: _openUpdates,
@@ -192,7 +318,7 @@ class HomePage extends StatelessWidget {
                 alignment: Alignment.center,
                 width: double.maxFinite,
                 child: Text(
-                  "List all Testing Labs",
+                  "All Testing Labs",
                   style: textStyle,
                 ),
               ),
@@ -254,4 +380,15 @@ class HomePage extends StatelessWidget {
   void _openUpdates() {
     Navigator.of(_context).pushNamed('/updates');
   }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
+
+Future onDidReceiveLocalNotification(
+    int id, String title, String body, String payload) {}
