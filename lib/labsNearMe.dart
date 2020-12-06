@@ -59,35 +59,48 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
                             ),
                           ),
                         ),
-                        children: List.generate(govtLabs.length, (i) {
-                          return Column(
-                            children: <Widget>[
-                              Divider(color: Colors.black38),
-                              RaisedButton(
-                                elevation: 2,
-                                color: Colors.white,
-                                onPressed: () {
-                                  MapsLauncher.launchQuery(
-                                      'https://www.google.com/maps/search/${govtLabs[i].replaceAll(' ', '+')}+$state');
-                                },
-                                child: Container(
-                                  width: double.maxFinite,
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 16,
-                                  ),
+                        children: (govtLabs ?? []).isEmpty
+                            ? [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
                                   child: Text(
-                                    govtLabs[i],
-                                    textAlign: TextAlign.center,
+                                    'Sorry there are no government labs near you',
                                     style: TextStyle(
+                                      color: Colors.black87,
                                       fontSize: 18,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        }),
+                              ]
+                            : List.generate(govtLabs.length, (i) {
+                                return Column(
+                                  children: <Widget>[
+                                    Divider(color: Colors.black38),
+                                    RaisedButton(
+                                      elevation: 2,
+                                      color: Colors.white,
+                                      onPressed: () {
+                                        MapsLauncher.launchQuery(
+                                            '${govtLabs[i]}, $state');
+                                      },
+                                      child: Container(
+                                        width: double.maxFinite,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 16,
+                                        ),
+                                        child: Text(
+                                          govtLabs[i],
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }),
                       ),
                       ExpansionTile(
                         onExpansionChanged: (state) {
@@ -127,7 +140,7 @@ class _LabsNearMeState extends State<LabsNearMe> with AfterLayoutMixin {
                                       color: Colors.white,
                                       onPressed: () {
                                         MapsLauncher.launchQuery(
-                                            'https://www.google.com/maps/search/${govtLabs[i].replaceAll(' ', '+')}+$state');
+                                            '${pvtLabs[i]}, $state');
                                       },
                                       child: Container(
                                         width: double.maxFinite,

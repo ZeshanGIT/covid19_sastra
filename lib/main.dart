@@ -1,13 +1,15 @@
 import 'package:after_layout/after_layout.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:android_intent/android_intent.dart';
 import 'package:covid19_sastra/labs.dart';
 import 'package:covid19_sastra/labsNearMe.dart';
 import 'package:covid19_sastra/listAllhelpLines.dart';
 import 'package:covid19_sastra/tracker.dart';
+import 'package:covid19_sastra/washHands.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:esys_flutter_share/esys_flutter_share.dart' as EsysFlutterShare;
@@ -16,51 +18,64 @@ import 'shared.dart';
 import 'updates/updates.dart';
 
 Future<void> main() async {
-  runApp(MyApp());
-  final int helloAlarmID = 0;
-  await AndroidAlarmManager.initialize();
-  print(await AndroidAlarmManager.periodic(
-    const Duration(hours: 2),
-    helloAlarmID,
-    showNoti,
-  ));
+  runApp(new MyApp());
+
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // bool check = prefs.getBool('isNotOpened') ?? true;
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+  //     .then((_) async {
+  //   if (check) {
+  //     await Workmanager.initialize(callBack);
+  //     await Workmanager.registerPeriodicTask(
+  //       "2",
+  //       "simplePeriodicTask",
+  //       frequency: Duration(hours: 2),
+  //     );
+  //     prefs.setBool('isNotOpened', false);
+  //   }
+  // });
 }
 
-Future<void> showNoti() async {
-  if (!(DateTime.now().hour < 6 || DateTime.now().hour > 21)) {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('noti_icon');
-    var initializationSettingsIOS = IOSInitializationSettings(
-      requestSoundPermission: false,
-      requestBadgePermission: false,
-      requestAlertPermission: false,
-      onDidReceiveLocalNotification: onDidReceiveLocalNotification,
-    );
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      '1',
-      'washYourHands',
-      'for20seconds',
-    );
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    NotificationDetails platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    // await flutterLocalNotificationsPlugin.show(
-    //     0, 'asdf', 'fdsa', platformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      1,
-      'Wash for hands',
-      'for 20 seconds',
-      platformChannelSpecifics,
-    );
-  }
-  // print('############################');
-}
+// callBack() {
+//   Workmanager.executeTask((_, __) async {
+//     await showNoti();
+//     return Future.value(true);
+//   });
+// }
+
+// Future<void> showNoti() async {
+//   if (!(DateTime.now().hour < 6 || DateTime.now().hour > 21)) {
+//     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//         FlutterLocalNotificationsPlugin();
+//     var initializationSettingsAndroid =
+//         AndroidInitializationSettings('noti_icon');
+//     var initializationSettingsIOS = IOSInitializationSettings(
+//       requestSoundPermission: false,
+//       requestBadgePermission: false,
+//       requestAlertPermission: false,
+//       onDidReceiveLocalNotification: onDidReceiveLocalNotification,
+//     );
+//     var initializationSettings = InitializationSettings(
+//         initializationSettingsAndroid, initializationSettingsIOS);
+//     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+//         onSelectNotification: onSelectNotification);
+//     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+//       '1',
+//       'washYourHands',
+//       'for20seconds',
+//     );
+//     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+//     NotificationDetails platformChannelSpecifics = NotificationDetails(
+//         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+//     await flutterLocalNotificationsPlugin.show(
+//       1,
+//       "Stay germ-free !",
+//       'Wash your hands for 20 seconds. Click here to know why.',
+//       platformChannelSpecifics,
+//     );
+//   }
+// }
 
 Future onSelectNotification(String payload) async {}
 
@@ -83,6 +98,7 @@ class MyApp extends StatelessWidget {
         '/dnd': (_) => PDFScreen("Do's and Dont's", 'dnd.pdf'),
         '/allLabs': (_) => AllLabs(),
         '/listAllHelplines': (_) => ListAllHelplines(),
+        '/washHands': (_) => WashHands(),
       },
       home: HomePage(),
     );
@@ -100,8 +116,8 @@ class _HomePageState extends State<HomePage> with AfterLayoutMixin {
   String state = '';
 
   void openLocationSetting() async {
-    if ((await Geolocator().checkGeolocationPermissionStatus()) !=
-        GeolocationStatus.granted) {
+    if ((await Geolocator().checkGeolocationPermissionStatus()) ==
+        GeolocationStatus.disabled) {
       final AndroidIntent intent = new AndroidIntent(
         action: 'android.settings.LOCATION_SOURCE_SETTINGS',
       );
@@ -111,6 +127,13 @@ class _HomePageState extends State<HomePage> with AfterLayoutMixin {
 
   @override
   Future<void> afterFirstLayout(BuildContext context) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    var notificationAppLaunchDetails =
+        await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    if (notificationAppLaunchDetails.didNotificationLaunchApp) {
+      Navigator.of(context).pushNamed('/washHands');
+    }
     openLocationSetting();
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -167,8 +190,21 @@ class _HomePageState extends State<HomePage> with AfterLayoutMixin {
                               ),
                             ),
                             SizedBox(height: 24),
+                            Container(
+                              width: double.maxFinite,
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Developed by',
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 24),
+                            Image.asset('assets/dsc.png'),
+                            SizedBox(height: 24),
                             Text(
-                              'Developed By',
+                              'Developer',
                               style: TextStyle(
                                 color: Colors.black54,
                               ),
@@ -237,7 +273,26 @@ class _HomePageState extends State<HomePage> with AfterLayoutMixin {
                   padding: EdgeInsets.all(12.0),
                   color: Colors.white,
                   onPressed: () {
-                    _launchURL('tel:${helpLine[state]}');
+                    if (state != '')
+                      _launchURL('tel:${helpLine[state]}');
+                    else
+                      showDialog(
+                          context: context,
+                          builder: (_) {
+                            return AlertDialog(
+                              title: Text('Sorry'),
+                              content: Text(
+                                  'Either your Location is not turned on or wait for it load'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            );
+                          });
                   },
                   shape: StadiumBorder(),
                   child: Text(
@@ -273,7 +328,7 @@ class _HomePageState extends State<HomePage> with AfterLayoutMixin {
                 alignment: Alignment.center,
                 width: double.maxFinite,
                 child: Text(
-                  'Govt. of India Updates',
+                  'Govt. of India Circulars',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
